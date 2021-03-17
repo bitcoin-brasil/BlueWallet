@@ -17,8 +17,7 @@ const cStyles = StyleSheet.create({
     position: 'absolute',
     bottom: 30,
   },
-  rootInline: {
-  },
+  rootInline: {},
   rootPre: {
     position: 'absolute',
     bottom: -1000,
@@ -105,6 +104,9 @@ export const FButton = ({ text, icon, width, first, last, ...props }) => {
     text: {
       color: colors.buttonAlternativeTextColor,
     },
+    textDisabled: {
+      color: colors.formBorder,
+    },
   });
   const style = {};
 
@@ -119,7 +121,7 @@ export const FButton = ({ text, icon, width, first, last, ...props }) => {
   return (
     <TouchableOpacity style={[bStyles.root, bStylesHook.root, style]} {...props}>
       <View style={bStyles.icon}>{icon}</View>
-      <Text numberOfLines={1} style={[bStyles.text, bStylesHook.text]}>
+      <Text numberOfLines={1} style={[bStyles.text, props.disabled ? bStylesHook.textDisabled : bStylesHook.text]}>
         {text}
       </Text>
     </TouchableOpacity>
@@ -132,4 +134,5 @@ FButton.propTypes = {
   width: PropTypes.number,
   first: PropTypes.bool,
   last: PropTypes.bool,
+  disabled: PropTypes.bool,
 };

@@ -568,8 +568,8 @@
     "sign_help": "Here you can create or verify a cryptographic signature based on a Bitcoin address",
     "sign_sign": "Sign",
     "sign_verify": "Verify",
-    "sign_signature_correct": "Signature is correct!",
-    "sign_signature_incorrect": "Signature is incorrect!",
+    "sign_signature_correct": "Verification Succeeded!",
+    "sign_signature_incorrect": "Verification Failed!",
     "sign_placeholder_address": "Address",
     "sign_placeholder_message": "Message",
     "sign_placeholder_signature": "Signature"

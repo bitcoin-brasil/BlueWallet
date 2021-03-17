@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { Alert, Keyboard, Platform, StyleSheet, TextInput } from 'react-native';
+import { ActivityIndicator, Alert, Keyboard, Platform, StyleSheet, TextInput, View } from 'react-native';
 import { useRoute, useTheme } from '@react-navigation/native';
 
 import { BlueDoneAndDismissKeyboardInputAccessory, BlueFormLabel, BlueSpacing10, BlueSpacing20, SafeBlueArea } from '../../BlueComponents';
@@ -10,12 +10,13 @@ import loc from '../../loc';
 
 const SignVerify = () => {
   const { colors } = useTheme();
-  const { wallets } = useContext(BlueStorageContext);
+  const { wallets, sleep } = useContext(BlueStorageContext);
   const { params } = useRoute();
   const [isToolbarVisibleForAndroid, setIsToolbarVisibleForAndroid] = useState(false);
   const [address, setAddress] = useState(params.address);
   const [message, setMessage] = useState('');
   const [signature, setSignature] = useState('');
+  const [loading, setLoading] = useState(false);
   const wallet = wallets.find(w => w.getID() === params.walletID);
 
   useEffect(() => {
@@ -39,16 +40,21 @@ const SignVerify = () => {
     },
   });
 
-  const handleSign = () => {
+  const handleSign = async () => {
+    setLoading(true);
+    await sleep(10); // wait for loading indicator to appear
     try {
       const newSignature = wallet.signMessage(message, address);
       setSignature(newSignature);
     } catch (e) {
       Alert.alert(loc.errors.error, e.message);
     }
+    setLoading(false);
   };
 
-  const handleVerify = () => {
+  const handleVerify = async () => {
+    setLoading(true);
+    await sleep(10); // wait for loading indicator to appear
     try {
       const res = wallet.verifyMessage(message, address, signature);
       Alert.alert(
@@ -58,7 +64,15 @@ const SignVerify = () => {
     } catch (e) {
       Alert.alert(loc.errors.error, e.message);
     }
+    setLoading(false);
   };
+
+  if (loading)
+    return (
+      <View style={[styles.loading]}>
+        <ActivityIndicator />
+      </View>
+    );
 
   return (
     <SafeBlueArea style={[styles.root, stylesHooks.root]}>
@@ -79,6 +93,7 @@ const SignVerify = () => {
         autoCorrect={false}
         autoCapitalize="none"
         spellCheck={false}
+        editable={!loading}
       />
       <BlueSpacing10 />
 
@@ -95,6 +110,7 @@ const SignVerify = () => {
         autoCorrect={false}
         autoCapitalize="none"
         spellCheck={false}
+        editable={!loading}
       />
       <BlueSpacing10 />
 
@@ -106,17 +122,19 @@ const SignVerify = () => {
         onChangeText={setMessage}
         testID="Message"
         inputAccessoryViewID={BlueDoneAndDismissKeyboardInputAccessory.InputAccessoryViewID}
-        style={[styles.flex, styles.text, stylesHooks.text]}
+        style={[styles.flex, styles.text, styles.textMessage, stylesHooks.text]}
         autoCorrect={false}
         autoCapitalize="none"
         spellCheck={false}
+        editable={!loading}
       />
       <BlueSpacing20 />
 
       <FContainer inline>
-        <FButton onPress={handleSign} text="Sign" />
-        <FButton onPress={handleVerify} text="Verify" />
+        <FButton onPress={handleSign} text={loc.addresses.sign_sign} disabled={loading} />
+        <FButton onPress={handleVerify} text={loc.addresses.sign_verify} disabled={loading} />
       </FContainer>
+      <BlueSpacing10 />
 
       {Platform.select({
         ios: (
@@ -152,7 +170,7 @@ export default SignVerify;
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    paddingTop: 40,
+    // paddingTop: 40,
   },
   text: {
     paddingHorizontal: 8,
@@ -164,7 +182,19 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     textAlignVertical: 'top',
   },
+  textMessage: {
+    minHeight: 100,
+  },
   flex: {
     flex: 1,
+  },
+  loading: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
