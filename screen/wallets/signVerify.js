@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { ActivityIndicator, Alert, Keyboard, Platform, StyleSheet, TextInput, View } from 'react-native';
 import { useRoute, useTheme } from '@react-navigation/native';
-
+import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
 import { BlueDoneAndDismissKeyboardInputAccessory, BlueFormLabel, BlueSpacing10, BlueSpacing20, SafeBlueArea } from '../../BlueComponents';
 import navigationStyle from '../../components/navigationStyle';
 import { FContainer, FButton } from '../../components/FloatButtons';
@@ -47,6 +47,7 @@ const SignVerify = () => {
       const newSignature = wallet.signMessage(message, address);
       setSignature(newSignature);
     } catch (e) {
+      ReactNativeHapticFeedback.trigger('notificationError', { ignoreAndroidSystemSettings: false });
       Alert.alert(loc.errors.error, e.message);
     }
     setLoading(false);
@@ -61,7 +62,11 @@ const SignVerify = () => {
         res ? loc._.success : loc.errors.error,
         res ? loc.addresses.sign_signature_correct : loc.addresses.sign_signature_incorrect,
       );
+      if (res) {
+        ReactNativeHapticFeedback.trigger('notificationSuccess', { ignoreAndroidSystemSettings: false });
+      }
     } catch (e) {
+      ReactNativeHapticFeedback.trigger('notificationError', { ignoreAndroidSystemSettings: false });
       Alert.alert(loc.errors.error, e.message);
     }
     setLoading(false);
